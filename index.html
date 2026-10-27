@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spice Route Kitchen – Menu</title>
+  <meta name="description" content="Browse our menu and order on WhatsApp.">
+  <meta name="theme-color" content="#d9480f">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/logo.svg" alt="" width="36" height="36">
+      <span id="brandName">Spice Route Kitchen</span>
+    </div>
+    <button id="cartBtnTop" class="btn btn-cart" data-act="open-cart" aria-label="Open cart">
+      Cart <span id="cartCountTop" class="count">0</span>
+    </button>
+  </header>
+
+  <section class="hero">
+    <img id="heroImg" alt="" width="1400" height="600">
+    <div class="hero-text">
+      <h1 id="heroTitle">Spice Route Kitchen</h1>
+      <p id="heroTagline">Freshly cooked. Delivered hot.</p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="tools">
+      <input id="searchInput" type="search" placeholder="Search dishes…" aria-label="Search dishes" autocomplete="off">
+      <nav id="chips" class="chips" aria-label="Categories"></nav>
+    </div>
+
+    <div id="menuGrid" class="grid" aria-live="polite"></div>
+    <p id="noResults" class="empty" hidden>No dishes match your search.</p>
+  </main>
+
+  <footer class="footer">
+    <p>Your order is only placed once you press Send in WhatsApp.</p>
+    <button class="link" data-act="open-admin">Manage menu</button>
+  </footer>
+
+  <!-- Mobile cart bar -->
+  <button id="cartFab" class="fab" data-act="open-cart" hidden>
+    <span>View cart · <span id="fabCount">0</span> items</span>
+    <strong id="fabTotal">₹0</strong>
+  </button>
+
+  <div id="overlay" class="overlay" data-act="close" hidden></div>
+
+  <!-- Cart + checkout -->
+  <aside id="cartPanel" class="panel" role="dialog" aria-modal="true" aria-labelledby="cartTitle" hidden>
+    <div class="panel-head">
+      <h2 id="cartTitle">Your Cart</h2>
+      <button class="icon-btn" data-act="close" aria-label="Close">×</button>
+    </div>
+
+    <div id="cartView" class="panel-body">
+      <p id="cartEmpty" class="empty">Your cart is empty. Add something tasty from the menu.</p>
+      <ul id="cartList" class="cart-list"></ul>
+      <dl id="cartTotals" class="totals"></dl>
+      <div class="actions">
+        <button id="checkoutBtn" class="btn btn-primary" data-act="checkout">Checkout</button>
+        <button id="clearCartBtn" class="btn btn-ghost" data-act="clear">Clear cart</button>
+      </div>
+    </div>
+
+    <div id="checkoutView" class="panel-body" hidden>
+      <button class="link" data-act="back">← Back to cart</button>
+
+      <h3>Order summary</h3>
+      <ul id="orderSummary" class="summary-list"></ul>
+      <dl id="summaryTotals" class="totals"></dl>
+
+      <h3>Your details</h3>
+      <form id="checkoutForm" novalidate>
+        <label>Name *
+          <input name="name" type="text" maxlength="60" autocomplete="name" aria-describedby="err-name">
+          <span class="error" id="err-name"></span>
+        </label>
+        <label>Phone number *
+          <input name="phone" type="tel" inputmode="tel" maxlength="16" autocomplete="tel" placeholder="98765 43210" aria-describedby="err-phone">
+          <span class="error" id="err-phone"></span>
+        </label>
+        <label>Delivery address *
+          <textarea name="address" rows="2" maxlength="200" autocomplete="street-address" aria-describedby="err-address"></textarea>
+          <span class="error" id="err-address"></span>
+        </label>
+        <label>Landmark (optional)
+          <input name="landmark" type="text" maxlength="80">
+        </label>
+        <label>Order notes (optional)
+          <textarea name="notes" rows="2" maxlength="200" placeholder="e.g. less spicy, no onion"></textarea>
+        </label>
+        <button class="btn btn-wa" type="submit">Order on WhatsApp</button>
+        <p class="hint">WhatsApp will open with your order ready to send. Press Send there to place it.</p>
+      </form>
+
+      <div id="waNotice" class="notice" hidden>
+        <strong>Almost done!</strong> Press <em>Send</em> in WhatsApp to place your order — it is not placed until you do.
+        Your cart is saved. WhatsApp didn't open? <a id="waLink" href="#" target="_blank" rel="noopener">Open WhatsApp</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Menu management -->
+  <aside id="adminPanel" class="panel panel-wide" role="dialog" aria-modal="true" aria-labelledby="adminTitle" hidden>
+    <div class="panel-head">
+      <h2 id="adminTitle">Manage Menu</h2>
+      <button class="icon-btn" data-act="close" aria-label="Close">×</button>
+    </div>
+    <div class="panel-body">
+      <p class="notice">Changes are saved in <strong>this browser only</strong> (LocalStorage). They are not shared with other devices or customers.</p>
+
+      <form id="itemForm" novalidate>
+        <h3 id="itemFormTitle">Add item</h3>
+        <input type="hidden" name="id">
+        <label>Name *<input name="name" type="text" maxlength="60"></label>
+        <label>Description<textarea name="description" rows="2" maxlength="140"></textarea></label>
+        <div class="row">
+          <label>Price (₹) *<input name="price" type="number" min="1" step="0.01" inputmode="decimal"></label>
+          <label>Category<select name="category"></select></label>
+        </div>
+        <label>Image URL<input name="image" type="url" placeholder="https://… or assets/photo.jpg"></label>
+        <label class="check"><input name="available" type="checkbox" checked> Available</label>
+        <p class="error" id="itemError"></p>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit" id="itemSubmit">Add item</button>
+          <button class="btn btn-ghost" type="button" data-act="cancel-edit" id="itemCancel" hidden>Cancel edit</button>
+        </div>
+      </form>
+
+      <h3>Menu items</h3>
+      <ul id="adminList" class="admin-list"></ul>
+      <button class="btn btn-ghost" data-act="reset-menu">Reset Sample Menu</button>
+    </div>
+  </aside>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
